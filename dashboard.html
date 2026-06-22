@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Composer — BEUJAYA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<script>(function(){document.documentElement.style.visibility='hidden';fetch('/api/me',{credentials:'same-origin'}).then(function(r){if(r.ok){document.documentElement.style.visibility='';}else{location.replace('index.html');}}).catch(function(){location.replace('index.html');});})();</script>
+<div class="app-wrapper">
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⬡</div>
+      <div class="brand-text">
+        <span class="brand-name">BEUJAYA</span>
+        <span class="brand-sub">FB AFFILIATE</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" href="dashboard.html" data-label="Composer"><span class="nav-icon">📤</span><span>Composer</span></a>
+      <a class="nav-item" href="accounts.html" data-label="Accounts"><span class="nav-icon">👥</span><span>Accounts</span></a>
+      <a class="nav-item" href="settings.html" data-label="Settings"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+      <a class="nav-item" href="/api/logout" data-label="Logout"><span class="nav-icon">🚪</span><span>Logout</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-status"><span class="status-dot"></span><span>ONLINE</span></div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="page-title">COMPOSER</span>
+        <span class="version-tag">v2.4</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="location.href='accounts.html'">👥 Manage Accounts</button>
+    </div>
+
+    <div class="content-area">
+      <div class="panels-grid">
+
+        <!-- PANEL 1 — ACCOUNTS -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Accounts</span>
+            <span class="step-badge">STEP 1</span>
+          </div>
+          <div class="panel-body">
+            <div class="mode-tabs">
+              <div class="mode-tab active">All Pages</div>
+              <div class="mode-tab">Active</div>
+            </div>
+            <div class="page-select-list" id="acctList">
+              <div class="page-item selected" data-name="Geupap Official"><span class="page-item-dot"></span><span>Geupap Official</span></div>
+              <div class="page-item selected" data-name="Aceh Affiliate"><span class="page-item-dot"></span><span>Aceh Affiliate</span></div>
+              <div class="page-item selected" data-name="Promo Harian"><span class="page-item-dot"></span><span>Promo Harian</span></div>
+              <div class="page-item" data-name="Toko Umil"><span class="page-item-dot"></span><span>Toko Umil</span></div>
+              <div class="page-item" data-name="Diskon Gila"><span class="page-item-dot"></span><span>Diskon Gila</span></div>
+            </div>
+            <div class="detected-count" id="acctCount">3 of 5 pages selected</div>
+          </div>
+        </div>
+
+        <!-- PANEL 2 — COMPOSE -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Compose</span>
+            <span class="step-badge">STEP 2</span>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Status / Caption</label>
+              <textarea class="form-control" id="statusInput" placeholder="Write your post...">🔥 PROMO HARI INI! Diskon 50% untuk produk terlaris. Stok terbatas — buruan sebelum kehabisan! 👇</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Affiliate Link</label>
+              <input class="form-control" id="linkInput" placeholder="https://..." value="https://geupap.com/promo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Link Title</label>
+              <input class="form-control" id="titleInput" placeholder="Product title" value="Diskon 50% — Produk Terlaris">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Image</label>
+              <div class="upload-zone" id="uploadZone" onclick="addImage()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text" id="uploadText">Click or drag image here</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Schedule</label>
+              <div class="toggle-wrap">
+                <input type="checkbox" class="toggle-input" id="schedToggle">
+                <label class="toggle-label" for="schedToggle"></label>
+                <span class="text-muted">Post immediately</span>
+              </div>
+            </div>
+          </div>
+          <div class="submit-bar">
+            <div class="progress-dots">
+              <div class="progress-dot done"></div>
+              <div class="progress-dot done"></div>
+              <div class="progress-dot"></div>
+            </div>
+            <button class="btn btn-post" id="postBtn" onclick="runPost()">🚀 POST TO 3 PAGES</button>
+          </div>
+        </div>
+
+        <!-- PANEL 3 — PREVIEW -->
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Preview</span>
+            <span class="step-badge">LIVE</span>
+          </div>
+          <div class="panel-body">
+            <div class="preview-container">
+              <div class="preview-phone">
+                <div class="preview-phone-bar">
+                  <div class="preview-avatar">G</div>
+                  <div>
+                    <div class="preview-page-name">Geupap Official</div>
+                    <div class="preview-sponsored">Sponsored · 🌐</div>
+                  </div>
+                </div>
+                <div class="preview-status-text" id="prevStatus"></div>
+                <div class="preview-image" id="prevImg" style="background:linear-gradient(135deg,#00e5a0,#0099ff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:32px">🖼️</div>
+                <div class="preview-link-bar">
+                  <div class="preview-link-domain" id="prevDomain">GEUPAP.COM</div>
+                  <div class="preview-link-title" id="prevTitle"></div>
+                </div>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <label class="form-label">Activity Log</label>
+            <div class="log-panel" id="logPanel" style="height:150px">
+              <div class="log-line info">[ready] composer initialized</div>
+              <div class="log-line">[info] 3 pages selected</div>
+              <div class="log-line success">[ok] session active · ONLINE</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Theme ──
+(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=t==='dark'?'🌙':'☀️';})();
+function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);var b=document.getElementById('themeBtn');if(b)b.textContent=n==='dark'?'🌙':'☀️';}
+
+// ── Sidebar collapse / mobile ──
+function toggleSidebar(){var s=document.getElementById('sidebar');if(window.innerWidth<=720){s.classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}else{s.classList.toggle('collapsed');}}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+// ── Live preview ──
+var statusEl=document.getElementById('statusInput');
+var titleEl=document.getElementById('titleInput');
+var linkEl=document.getElementById('linkInput');
+function syncPreview(){
+  document.getElementById('prevStatus').textContent=statusEl.value||' ';
+  document.getElementById('prevTitle').textContent=titleEl.value||'Link title';
+  try{var d=new URL(linkEl.value).hostname.replace('www.','').toUpperCase();document.getElementById('prevDomain').textContent=d||'GEUPAP.COM';}catch(e){document.getElementById('prevDomain').textContent='GEUPAP.COM';}
+}
+statusEl.addEventListener('input',syncPreview);
+titleEl.addEventListener('input',syncPreview);
+linkEl.addEventListener('input',syncPreview);
+syncPreview();
+
+// ── Account selection ──
+function refreshCount(){
+  var sel=document.querySelectorAll('.page-item.selected').length;
+  var tot=document.querySelectorAll('.page-item').length;
+  document.getElementById('acctCount').textContent=sel+' of '+tot+' pages selected';
+  document.getElementById('postBtn').textContent='🚀 POST TO '+sel+' PAGE'+(sel===1?'':'S');
+}
+document.querySelectorAll('.page-item').forEach(function(it){
+  it.addEventListener('click',function(){it.classList.toggle('selected');refreshCount();log('[info] '+(it.classList.contains('selected')?'+ ':'- ')+it.dataset.name);});
+});
+
+// ── Image ──
+function addImage(){
+  document.getElementById('uploadText').textContent='✓ image-promo.jpg attached';
+  document.getElementById('uploadZone').style.borderColor='var(--accent)';
+  log('[ok] image attached');
+}
+
+// ── Log helper ──
+function log(msg,cls){
+  var p=document.getElementById('logPanel');
+  var d=document.createElement('div');
+  d.className='log-line'+(cls?' '+cls:'');
+  d.textContent=msg;
+  p.appendChild(d);
+  p.scrollTop=p.scrollHeight;
+}
+
+// ── Mock post run ──
+function runPost(){
+  var btn=document.getElementById('postBtn');
+  var pages=Array.from(document.querySelectorAll('.page-item.selected')).map(function(x){return x.dataset.name;});
+  if(!pages.length){log('[error] no pages selected',' error');return;}
+  btn.disabled=true;
+  var dots=document.querySelectorAll('.progress-dot');
+  dots.forEach(function(d){d.classList.remove('done','active');});
+  log('[run] publishing to '+pages.length+' pages...',' info');
+  var i=0;
+  (function next(){
+    if(i>=pages.length){
+      log('[done] '+pages.length+' posts published ✓',' success');
+      btn.disabled=false;
+      btn.textContent='✓ POSTED — RUN AGAIN';
+      return;
+    }
+    if(dots[i]){dots[i].classList.add('active');}
+    setTimeout(function(){
+      if(dots[i]){dots[i].classList.remove('active');dots[i].classList.add('done');}
+      log('[ok] posted → '+pages[i],' success');
+      i++;next();
+    },700);
+  })();
+}
+</script>
+</body>
+</html>

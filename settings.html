@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — BEUJAYA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<script>(function(){document.documentElement.style.visibility='hidden';fetch('/api/me',{credentials:'same-origin'}).then(function(r){if(r.ok){document.documentElement.style.visibility='';}else{location.replace('index.html');}}).catch(function(){location.replace('index.html');});})();</script>
+<div class="app-wrapper">
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⬡</div>
+      <div class="brand-text">
+        <span class="brand-name">BEUJAYA</span>
+        <span class="brand-sub">FB AFFILIATE</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="dashboard.html" data-label="Composer"><span class="nav-icon">📤</span><span>Composer</span></a>
+      <a class="nav-item" href="accounts.html" data-label="Accounts"><span class="nav-icon">👥</span><span>Accounts</span></a>
+      <a class="nav-item active" href="settings.html" data-label="Settings"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+      <a class="nav-item" href="/api/logout" data-label="Logout"><span class="nav-icon">🚪</span><span>Logout</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-status"><span class="status-dot"></span><span>ONLINE</span></div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="page-title">SETTINGS</span>
+        <span class="version-tag">v2.4</span>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="panels-grid" style="grid-template-columns:1fr 1fr">
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Posting Defaults</span></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Default Page Role</label>
+              <select class="form-control"><option>Geupap Official</option><option>Aceh Affiliate</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Delay Between Posts (sec)</label>
+              <input class="form-control" type="number" value="8">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Auto-retry on Fail</label>
+              <div class="toggle-wrap">
+                <input type="checkbox" class="toggle-input" id="t1" checked>
+                <label class="toggle-label" for="t1"></label>
+                <span class="text-muted">Enabled</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-block">Save Settings</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Account</span></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              <input class="form-control" value="admin" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Change Password</label>
+              <input class="form-control" type="password" placeholder="new password">
+            </div>
+            <button class="btn btn-secondary btn-block mb-2">Update Password</button>
+            <div class="divider"></div>
+            <button class="btn btn-danger btn-block" onclick="location.href='/api/logout'">Log Out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=t==='dark'?'🌙':'☀️';})();
+function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);var b=document.getElementById('themeBtn');if(b)b.textContent=n==='dark'?'🌙':'☀️';}
+function toggleSidebar(){var s=document.getElementById('sidebar');if(window.innerWidth<=720){s.classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}else{s.classList.toggle('collapsed');}}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+</script>
+</body>
+</html>

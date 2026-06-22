@@ -1,0 +1,9 @@
+{
+  "name": "beujaya-app",
+  "version": "1.0.0",
+  "description": "BEUJAYA — FB affiliate tool UI demo with server-side (serverless) auth for Vercel",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  }
+}

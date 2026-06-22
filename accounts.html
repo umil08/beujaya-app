@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts — BEUJAYA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<script>(function(){document.documentElement.style.visibility='hidden';fetch('/api/me',{credentials:'same-origin'}).then(function(r){if(r.ok){document.documentElement.style.visibility='';}else{location.replace('index.html');}}).catch(function(){location.replace('index.html');});})();</script>
+<div class="app-wrapper">
+  <div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">⬡</div>
+      <div class="brand-text">
+        <span class="brand-name">BEUJAYA</span>
+        <span class="brand-sub">FB AFFILIATE</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="dashboard.html" data-label="Composer"><span class="nav-icon">📤</span><span>Composer</span></a>
+      <a class="nav-item active" href="accounts.html" data-label="Accounts"><span class="nav-icon">👥</span><span>Accounts</span></a>
+      <a class="nav-item" href="settings.html" data-label="Settings"><span class="nav-icon">⚙️</span><span>Settings</span></a>
+      <a class="nav-item" href="/api/logout" data-label="Logout"><span class="nav-icon">🚪</span><span>Logout</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-status"><span class="status-dot"></span><span>ONLINE</span></div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">☰</button>
+        <span class="page-title">ACCOUNTS</span>
+        <span class="version-tag">v2.4</span>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="showAdd()">＋ Add Account</button>
+    </div>
+
+    <div class="content-area">
+      <div class="alert alert-success" id="addAlert" style="display:none">Demo mode — connect a backend to store real accounts.</div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Facebook Accounts</span>
+          <span class="step-badge" id="acctTotal">5 ACCOUNTS</span>
+        </div>
+        <div class="panel-body" style="overflow-x:auto">
+          <table class="accounts-table">
+            <thead>
+              <tr><th>Page</th><th>Status</th><th>Session Cookie</th><th>Role</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Geupap Official</td>
+                <td><span class="account-badge badge-active">ACTIVE</span></td>
+                <td class="cookie-preview">c_user=100••••••; xs=39%3A••••</td>
+                <td><span class="account-badge badge-default">DEFAULT</span></td>
+                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td>Aceh Affiliate</td>
+                <td><span class="account-badge badge-active">ACTIVE</span></td>
+                <td class="cookie-preview">c_user=100••••••; xs=2a%3A••••</td>
+                <td>—</td>
+                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td>Promo Harian</td>
+                <td><span class="account-badge badge-active">ACTIVE</span></td>
+                <td class="cookie-preview">c_user=100••••••; xs=7f%3A••••</td>
+                <td>—</td>
+                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
+              </tr>
+              <tr>
+                <td>Toko Umil</td>
+                <td><span class="account-badge badge-inactive">INACTIVE</span></td>
+                <td class="cookie-preview">expired</td>
+                <td>—</td>
+                <td><button class="btn btn-danger btn-sm">Renew</button></td>
+              </tr>
+              <tr>
+                <td>Diskon Gila</td>
+                <td><span class="account-badge badge-inactive">INACTIVE</span></td>
+                <td class="cookie-preview">—</td>
+                <td>—</td>
+                <td><button class="btn btn-danger btn-sm">Renew</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=t==='dark'?'🌙':'☀️';})();
+function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);var b=document.getElementById('themeBtn');if(b)b.textContent=n==='dark'?'🌙':'☀️';}
+function toggleSidebar(){var s=document.getElementById('sidebar');if(window.innerWidth<=720){s.classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}else{s.classList.toggle('collapsed');}}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+function showAdd(){var a=document.getElementById('addAlert');a.style.display=a.style.display==='none'?'block':'none';}
+</script>
+</body>
+</html>
