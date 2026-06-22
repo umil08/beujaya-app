@@ -39,72 +39,132 @@
         <span class="page-title">ACCOUNTS</span>
         <span class="version-tag">v2.4</span>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="showAdd()">＋ Add Account</button>
+      <button class="btn btn-primary btn-sm" onclick="openAddModal()">＋ Add Account</button>
     </div>
 
     <div class="content-area">
-      <div class="alert alert-success" id="addAlert" style="display:none">Demo mode — connect a backend to store real accounts.</div>
+      <div class="alert alert-success" id="addAlert" style="display:none"></div>
 
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title">Facebook Accounts</span>
-          <span class="step-badge" id="acctTotal">5 ACCOUNTS</span>
+          <span class="step-badge" id="acctTotal">0 ACCOUNTS</span>
         </div>
         <div class="panel-body" style="overflow-x:auto">
           <table class="accounts-table">
             <thead>
               <tr><th>Page</th><th>Status</th><th>Session Cookie</th><th>Role</th><th>Actions</th></tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Geupap Official</td>
-                <td><span class="account-badge badge-active">ACTIVE</span></td>
-                <td class="cookie-preview">c_user=100••••••; xs=39%3A••••</td>
-                <td><span class="account-badge badge-default">DEFAULT</span></td>
-                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Aceh Affiliate</td>
-                <td><span class="account-badge badge-active">ACTIVE</span></td>
-                <td class="cookie-preview">c_user=100••••••; xs=2a%3A••••</td>
-                <td>—</td>
-                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Promo Harian</td>
-                <td><span class="account-badge badge-active">ACTIVE</span></td>
-                <td class="cookie-preview">c_user=100••••••; xs=7f%3A••••</td>
-                <td>—</td>
-                <td><button class="btn btn-secondary btn-sm">Edit</button></td>
-              </tr>
-              <tr>
-                <td>Toko Umil</td>
-                <td><span class="account-badge badge-inactive">INACTIVE</span></td>
-                <td class="cookie-preview">expired</td>
-                <td>—</td>
-                <td><button class="btn btn-danger btn-sm">Renew</button></td>
-              </tr>
-              <tr>
-                <td>Diskon Gila</td>
-                <td><span class="account-badge badge-inactive">INACTIVE</span></td>
-                <td class="cookie-preview">—</td>
-                <td>—</td>
-                <td><button class="btn btn-danger btn-sm">Renew</button></td>
-              </tr>
-            </tbody>
+            <tbody id="acctBody"></tbody>
           </table>
+          <div id="acctEmpty" style="display:none;text-align:center;padding:28px;color:var(--text3)">No accounts yet. Click “＋ Add Account”.</div>
         </div>
       </div>
     </div>
   </main>
 </div>
 
+<!-- Add Account modal -->
+<div id="acctModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeModal()">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.45)">
+    <div class="panel-header">
+      <span class="panel-title">Add Account</span>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div style="padding:20px">
+      <div class="form-group">
+        <label class="form-label">Page Name</label>
+        <input class="form-control" id="acName" placeholder="e.g. Toko Aceh Jaya" autocomplete="off" maxlength="60">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-control" id="acStatus"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role</label>
+        <select class="form-control" id="acRole"><option value="member">Member page</option><option value="default">Default page</option></select>
+      </div>
+      <div id="acError" style="display:none;color:var(--danger);font-size:13px;margin-bottom:10px"></div>
+      <button class="btn btn-primary btn-block" onclick="addAccount()">Save Account</button>
+    </div>
+  </div>
+</div>
+
 <script>
+// ── Theme / sidebar ──
 (function(){var t=localStorage.getItem('theme')||'dark';document.documentElement.setAttribute('data-theme',t);var b=document.getElementById('themeBtn');if(b)b.textContent=t==='dark'?'🌙':'☀️';})();
 function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);var b=document.getElementById('themeBtn');if(b)b.textContent=n==='dark'?'🌙':'☀️';}
 function toggleSidebar(){var s=document.getElementById('sidebar');if(window.innerWidth<=720){s.classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}else{s.classList.toggle('collapsed');}}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
-function showAdd(){var a=document.getElementById('addAlert');a.style.display=a.style.display==='none'?'block':'none';}
+
+// ── Accounts store (persisted per browser via localStorage) ──
+var KEY='beujaya_accounts';
+var SEED=[
+  {id:1,name:'Geupap Official',status:'active',role:'default',cookie:'c_user=100••••••; xs=39%3A••••'},
+  {id:2,name:'Aceh Affiliate',status:'active',role:'member',cookie:'c_user=100••••••; xs=2a%3A••••'},
+  {id:3,name:'Promo Harian',status:'active',role:'member',cookie:'c_user=100••••••; xs=7f%3A••••'},
+  {id:4,name:'Toko Umil',status:'inactive',role:'member',cookie:'expired'},
+  {id:5,name:'Diskon Gila',status:'inactive',role:'member',cookie:'—'}
+];
+function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(d))return d;}catch(e){}localStorage.setItem(KEY,JSON.stringify(SEED));return SEED.slice();}
+function save(){localStorage.setItem(KEY,JSON.stringify(accounts));}
+var accounts=load();
+
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function render(){
+  var tb=document.getElementById('acctBody');
+  tb.innerHTML=accounts.map(function(a){
+    var st=a.status==='active'?'<span class="account-badge badge-active">ACTIVE</span>':'<span class="account-badge badge-inactive">INACTIVE</span>';
+    var role=a.role==='default'?'<span class="account-badge badge-default">DEFAULT</span>':'<button class="btn btn-secondary btn-sm" onclick="setDefault('+a.id+')">Set default</button>';
+    return '<tr>'+
+      '<td>'+esc(a.name)+'</td>'+
+      '<td>'+st+'</td>'+
+      '<td class="cookie-preview">'+esc(a.cookie||'—')+'</td>'+
+      '<td>'+role+'</td>'+
+      '<td><button class="btn btn-danger btn-sm" onclick="removeAccount('+a.id+')">Remove</button></td>'+
+    '</tr>';
+  }).join('');
+  document.getElementById('acctTotal').textContent=accounts.length+' ACCOUNT'+(accounts.length===1?'':'S');
+  document.getElementById('acctEmpty').style.display=accounts.length?'none':'block';
+}
+
+function openAddModal(){
+  document.getElementById('acName').value='';
+  document.getElementById('acStatus').value='active';
+  document.getElementById('acRole').value='member';
+  document.getElementById('acError').style.display='none';
+  document.getElementById('acctModal').style.display='flex';
+  document.getElementById('acName').focus();
+}
+function closeModal(){document.getElementById('acctModal').style.display='none';}
+
+function rand(){return Math.floor(Math.random()*256).toString(16).padStart(2,'0');}
+function toast(msg){var a=document.getElementById('addAlert');a.textContent=msg;a.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(function(){a.style.display='none';},2800);}
+
+function addAccount(){
+  var name=document.getElementById('acName').value.trim();
+  if(!name){var e=document.getElementById('acError');e.textContent='Page name is required.';e.style.display='block';return;}
+  var status=document.getElementById('acStatus').value;
+  var role=document.getElementById('acRole').value;
+  if(role==='default'){accounts.forEach(function(x){x.role='member';});}
+  var id=accounts.reduce(function(m,x){return Math.max(m,x.id);},0)+1;
+  var cookie=status==='active'?('c_user=100••••••; xs='+rand()+'%3A••••'):'—';
+  accounts.push({id:id,name:name,status:status,role:role,cookie:cookie});
+  save();render();closeModal();toast('✓ Account "'+name+'" added & saved.');
+}
+function removeAccount(id){
+  var a=accounts.filter(function(x){return x.id===id;})[0];
+  if(!a)return;
+  if(!confirm('Remove "'+a.name+'"?'))return;
+  accounts=accounts.filter(function(x){return x.id!==id;});
+  save();render();toast('Account removed.');
+}
+function setDefault(id){
+  accounts.forEach(function(x){x.role=(x.id===id?'default':'member');});
+  save();render();toast('Default page updated.');
+}
+
+render();
 </script>
 </body>
 </html>
