@@ -48,7 +48,10 @@
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title">Facebook Accounts</span>
-          <span class="step-badge" id="acctTotal">0 ACCOUNTS</span>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span id="syncMode" style="font-size:11px;color:var(--text3)"></span>
+            <span class="step-badge" id="acctTotal">0 ACCOUNTS</span>
+          </div>
         </div>
         <div class="panel-body" style="overflow-x:auto">
           <table class="accounts-table">
@@ -97,7 +100,7 @@ function toggleTheme(){var n=document.documentElement.getAttribute('data-theme')
 function toggleSidebar(){var s=document.getElementById('sidebar');if(window.innerWidth<=720){s.classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}else{s.classList.toggle('collapsed');}}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
 
-// ── Accounts store (persisted per browser via localStorage) ──
+// ── Data layer: server DB (/api/accounts) with localStorage fallback ──
 var KEY='beujaya_accounts';
 var SEED=[
   {id:1,name:'Geupap Official',status:'active',role:'default',cookie:'c_user=100••••••; xs=39%3A••••'},
@@ -106,11 +109,24 @@ var SEED=[
   {id:4,name:'Toko Umil',status:'inactive',role:'member',cookie:'expired'},
   {id:5,name:'Diskon Gila',status:'inactive',role:'member',cookie:'—'}
 ];
-function load(){try{var d=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(d))return d;}catch(e){}localStorage.setItem(KEY,JSON.stringify(SEED));return SEED.slice();}
-function save(){localStorage.setItem(KEY,JSON.stringify(accounts));}
-var accounts=load();
+var serverMode=false;
+var accounts=[];
+
+function lsLoad(){try{var d=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(d))return d;}catch(e){}localStorage.setItem(KEY,JSON.stringify(SEED));return SEED.slice();}
+function lsSave(){localStorage.setItem(KEY,JSON.stringify(accounts));}
+
+async function api(method,body){
+  var opt={method:method,headers:{'Content-Type':'application/json'},credentials:'same-origin'};
+  if(body)opt.body=JSON.stringify(body);
+  var r=await fetch('/api/accounts',opt);
+  if(r.status===501)return {configured:false};
+  if(!r.ok)throw new Error('api '+r.status);
+  return r.json();
+}
+async function apiSafe(method,body){try{return await api(method,body);}catch(e){return null;}}
 
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function setMode(t){var el=document.getElementById('syncMode');if(el)el.textContent=t;}
 function render(){
   var tb=document.getElementById('acctBody');
   tb.innerHTML=accounts.map(function(a){
@@ -141,30 +157,40 @@ function closeModal(){document.getElementById('acctModal').style.display='none';
 function rand(){return Math.floor(Math.random()*256).toString(16).padStart(2,'0');}
 function toast(msg){var a=document.getElementById('addAlert');a.textContent=msg;a.style.display='block';clearTimeout(window._toast);window._toast=setTimeout(function(){a.style.display='none';},2800);}
 
-function addAccount(){
+async function addAccount(){
   var name=document.getElementById('acName').value.trim();
   if(!name){var e=document.getElementById('acError');e.textContent='Page name is required.';e.style.display='block';return;}
   var status=document.getElementById('acStatus').value;
   var role=document.getElementById('acRole').value;
-  if(role==='default'){accounts.forEach(function(x){x.role='member';});}
+  if(serverMode){
+    var j=await apiSafe('POST',{op:'add',name:name,status:status,role:role});
+    if(j&&j.ok){accounts=j.accounts;render();closeModal();toast('✓ "'+name+'" added & synced to server.');return;}
+  }
+  if(role==='default')accounts.forEach(function(x){x.role='member';});
   var id=accounts.reduce(function(m,x){return Math.max(m,x.id);},0)+1;
   var cookie=status==='active'?('c_user=100••••••; xs='+rand()+'%3A••••'):'—';
   accounts.push({id:id,name:name,status:status,role:role,cookie:cookie});
-  save();render();closeModal();toast('✓ Account "'+name+'" added & saved.');
+  lsSave();render();closeModal();toast('✓ "'+name+'" added & saved locally.');
 }
-function removeAccount(id){
-  var a=accounts.filter(function(x){return x.id===id;})[0];
-  if(!a)return;
+async function removeAccount(id){
+  var a=accounts.filter(function(x){return x.id===id;})[0];if(!a)return;
   if(!confirm('Remove "'+a.name+'"?'))return;
-  accounts=accounts.filter(function(x){return x.id!==id;});
-  save();render();toast('Account removed.');
+  if(serverMode){var j=await apiSafe('POST',{op:'remove',id:id});if(j&&j.ok){accounts=j.accounts;render();toast('Removed & synced.');return;}}
+  accounts=accounts.filter(function(x){return x.id!==id;});lsSave();render();toast('Account removed.');
 }
-function setDefault(id){
-  accounts.forEach(function(x){x.role=(x.id===id?'default':'member');});
-  save();render();toast('Default page updated.');
+async function setDefault(id){
+  if(serverMode){var j=await apiSafe('POST',{op:'setDefault',id:id});if(j&&j.ok){accounts=j.accounts;render();toast('Default page updated.');return;}}
+  accounts.forEach(function(x){x.role=(x.id===id?'default':'member');});lsSave();render();toast('Default page updated.');
 }
 
-render();
+async function init(){
+  try{
+    var j=await api('GET');
+    if(j&&j.ok&&Array.isArray(j.accounts)){serverMode=true;accounts=j.accounts;setMode('☁ Server DB');render();return;}
+  }catch(e){}
+  serverMode=false;accounts=lsLoad();setMode('💾 Local only');render();
+}
+init();
 </script>
 </body>
 </html>
