@@ -16,9 +16,9 @@ module.exports = (req, res) => {
   b = b || {};
 
   const u = (b.username || '').trim();
-  const p = b.password || '';
+  const p = (b.password || '').trim();
 
-  if (u === process.env.BEUJAYA_USER && p === process.env.BEUJAYA_PASS) {
+  if (u === (process.env.BEUJAYA_USER || '').trim() && p === (process.env.BEUJAYA_PASS || '').trim()) {
     const token = sign({ u, exp: Date.now() + 86400000 });
     res.setHeader('Set-Cookie', `bjsession=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=86400; Secure`);
     return res.status(200).json({ ok: true });
